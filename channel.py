@@ -7,6 +7,40 @@ import re
 from better_profanity import profanity
 from textblob import TextBlob
 from flask_cors import CORS
+import click
+
+
+
+# Flask CLI command for registering the channel
+@app.cli.command('register')
+def register_command():
+    global HUB_URL, HUB_AUTHKEY, CHANNEL_AUTHKEY, CHANNEL_NAME, CHANNEL_ENDPOINT, CHANNEL_TYPE_OF_SERVICE
+
+    response = requests.post(
+        f"{HUB_URL}/channels",
+        headers={'Authorization': f'authkey {HUB_AUTHKEY}'},
+        json={
+            "name": CHANNEL_NAME,
+            "endpoint": CHANNEL_ENDPOINT,
+            "authkey": CHANNEL_AUTHKEY,
+            "type_of_service": CHANNEL_TYPE_OF_SERVICE,
+        }
+    )
+
+    if response.status_code != 200:
+        print(f"Error creating channel: {response.status_code}")
+        print(response.text)
+    else:
+        print("Channel successfully registered.")
+
+
+# Register the command
+app.cli.add_command(register_command)
+
+
+
+
+
 
 # Class-based application configuration
 class ConfigClass(object):
@@ -16,8 +50,10 @@ class ConfigClass(object):
 # Create Flask app
 app = Flask(__name__)
 CORS(app)
-app.config.from_object(__name__ + '.ConfigClass')  # configuration
+#app.config.from_object(__name__ + '.ConfigClass')  # configuration
 app.app_context().push()  # create an app context before initializing db
+
+# app.config.from_object(ConfigClass)  # Correct way to load configuration
 
 # Configuration
 HUB_URL = 'http://vm146.rz.uni-osnabrueck.de/hub'
@@ -148,23 +184,7 @@ def auto_response():
     incoming_message = request.json.get('content', '').lower()
     response = auto_reply_logic(incoming_message)
     return jsonify({"response": response}), 200
-def is_message_on_topic(content):
-    """Check if the message contains AI-related topics or math expressions."""
-    content_lower = content.lower()
 
-    # Allow greetings and general phrases
-    general_phrases = ["hello", "hi", "hey", "help", "question", "info"]
-
-    # Allow simple mathematical expressions (e.g. "2 + 3", "10 / 2")
-    math_pattern = re.compile(r'^\d+\s*[\+\-\*\/]\s*\d+$')
-
-    # Check AI-related topics, greetings, or math operations
-    if any(topic in content_lower for topic in ALLOWED_TOPICS) or \
-       any(phrase in content_lower for phrase in general_phrases) or \
-       math_pattern.match(content_lower):
-        return True
-
-    return False
 
 
 def auto_reply_logic(message):

@@ -1,18 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>List of channels</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI Chat Discussion</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-
-<h1>List of message channels</h1>
-
-<ul>
-    {% for channel in channels %}
-        <li><a href="{{ url_for('show_channel') }}?channel={{ channel.endpoint | urlencode }}">{{ channel.name }}</a> (Type: {{ channel.type_of_service}})</li>
-    {% endfor %}
-</ul>
-
+  <div class="container">
+    <!-- Sidebar for channels -->
+    <div class="sidebar">
+      <h2>Channels</h2>
+      <ul class="channel-list" id="channelList">
+        <!-- Channel items will be dynamically inserted -->
+      </ul>
+    </div>
+    <!-- Chat area for messages -->
+    <div class="chat-area">
+      <div class="chat-header" id="chatHeader">Welcome to AI Chat Discussion</div>
+      <div class="chat-messages" id="chatMessages">
+        <!-- Chat messages will appear here -->
+      </div>
+      <div class="chat-input">
+        <input type="text" id="messageInput" placeholder="Type your message..." />
+        <button id="sendBtn">Send</button>
+      </div>
+    </div>
+  </div>
+  <script src="script.js"></script>
 </body>
 </html>
